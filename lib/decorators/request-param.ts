@@ -1,8 +1,7 @@
-import {parameterDecoratorFactory} from "../utils/decorator-util";
+import {parameterDecoratorFactoryBuilder} from "../utils/decorator-util";
 
 export type RequestParamParam = {
-    value?: string;
-    name?: string;
+    name: string;
     required?: boolean;
     defaultValue?: string;
 } | string;
@@ -17,7 +16,7 @@ export type RequestParamValueItem = {
 
 export const REQUEST_PARAM_METADATA_KEY = Symbol('RequestParam');
 
-export const RequestParam = parameterDecoratorFactory<RequestParamParam, RequestParamValueItem>(
+export const RequestParam = parameterDecoratorFactoryBuilder<RequestParamParam, RequestParamValueItem>(
     REQUEST_PARAM_METADATA_KEY, (param, target, propertyKey, parameterIndex) => {
         const value = {
             name: '',

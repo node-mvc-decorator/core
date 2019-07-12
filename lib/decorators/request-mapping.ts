@@ -1,5 +1,5 @@
 import {RequestMethod} from "../enums/request-method";
-import {methodAndClassDecoratorFactoryBuilder} from "../utils/decorator-util";
+import {methodAndClassDecoratorFactoryBuilderOptionsEmptiable} from "../utils/decorator-util";
 import {getArrayValue} from "../utils/common-util";
 
 export const REQUEST_MAPPING_METADATA_KEY = Symbol('REQUEST_MAPPING_METADATA_KEY');
@@ -11,7 +11,7 @@ export type RequestMappingParam = {
     headers?: string[] | string;
     consumes?: string[] | string;
     produces?: string[] | string;
-} | string | void;
+} | string;
 
 export interface RequestMappingValue {
     path: string[];
@@ -30,12 +30,13 @@ const defaultMethod = [RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT,
 const metadataValueConverter = (param) => {
     const value = {
         method: defaultMethod,
-        path: [],
+        path: [''],
         params: [],
         headers: [],
         consumes: [],
         produces: []
     };
+    console.log(param);
     if (param) {
         if (typeof param === 'string') {
             return {
@@ -58,7 +59,7 @@ const metadataValueConverter = (param) => {
 };
 
 
-export const RequestMapping = methodAndClassDecoratorFactoryBuilder<RequestMappingParam,
+export const RequestMapping = methodAndClassDecoratorFactoryBuilderOptionsEmptiable<RequestMappingParam,
     RequestMappingValue, RequestMappingValue>(
     REQUEST_MAPPING_METADATA_KEY, metadataValueConverter, metadataValueConverter
 );
@@ -70,7 +71,7 @@ export type MethodMappingParam = {
     headers?: string[] | string;
     consumes?: string[] | string;
     produces?: string[] | string;
-} | string | void;
+} | string;
 
 
 /**
@@ -94,4 +95,4 @@ export const methodMappingFactory = (method: RequestMethod, param: MethodMapping
         path: '',
         method: RequestMethod.GET
     });
-}
+};

@@ -1,4 +1,4 @@
-import {classDecoratorFactoryBuilder} from "../utils/decorator-util";
+import {classDecoratorFactoryBuilder, classDecoratorFactoryBuilderOptionsEmptiable} from "../utils/decorator-util";
 import {SingleParameterMetadataValue, SingleParameterParam} from "./common/single-parameter";
 import {getBeanName} from "../utils/common-util";
 import {Constructor} from "../beans/constructor";
@@ -30,6 +30,6 @@ export type ServiceValue = {
     providers: Constructor[];
 }
 
-export const Service = classDecoratorFactoryBuilder<
+export const Service = classDecoratorFactoryBuilderOptionsEmptiable<
     SingleParameterParam<'name', string>, ServiceValue>(
     SERVICE_METADATA_KEY, serviceMetadataValueConverter);

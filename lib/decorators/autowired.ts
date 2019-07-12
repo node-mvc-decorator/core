@@ -10,14 +10,16 @@ export type AutowiredParam = {
     type: any;
 }
 
-export type AutowiredValue = {
+export type AutowiredValueItem = {
     required: boolean;
     type: any;
+    propertyKey: string;
 }
 
-export const Autowired = propertyDecoratorFactoryBuilder<AutowiredParam, AutowiredValue>(
-    AUTOWIRED_METADA_KEY, param => ({
-        required: param.required,
-        type: param.type
+export const Autowired = propertyDecoratorFactoryBuilder<AutowiredParam, AutowiredValueItem>(
+    AUTOWIRED_METADA_KEY, (option, target, propertyKey) => ({
+        required: option.required,
+        type: option.type,
+        propertyKey
     })
 );

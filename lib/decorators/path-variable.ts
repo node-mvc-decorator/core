@@ -1,4 +1,4 @@
-import {parameterDecoratorFactory} from "../utils/decorator-util";
+import {parameterDecoratorFactoryBuilder} from "../utils/decorator-util";
 
 
 export type PathVariableParam = {
@@ -13,7 +13,7 @@ export type PathVariableValueItem = {
 }
 
 export const PATH_VARIABLE_METADATA_KEY = Symbol('PathVariable');
-export const PathVariable = parameterDecoratorFactory<PathVariableParam, PathVariableValueItem>(
+export const PathVariable = parameterDecoratorFactoryBuilder<PathVariableParam, PathVariableValueItem>(
     PATH_VARIABLE_METADATA_KEY, (param, target, propertyKey, parameterIndex) => {
         const value = {
             name: '',

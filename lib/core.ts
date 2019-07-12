@@ -1,5 +1,5 @@
 import {Constructor} from "./beans/constructor";
-import {assertFalse, isConstructor, isFunction, stringValueToObjValue} from "./utils/common-util";
+import {assertFalse, assertTrue, isConstructor, isFunction, stringValueToObjValue} from "./utils/common-util";
 import {Response} from "./beans/response";
 import {Request} from "./beans/request";
 import {BadRequestError} from "./errors/bad-request-error";
@@ -11,6 +11,7 @@ import {REQUEST_PARAM_METADATA_KEY, RequestParamValueItem} from "./decorators/re
 import {REQUEST_BODY_METADATA_KEY, RequestBodyValueItem} from "./decorators/request-body";
 import {Router} from "./beans/router";
 import {CONTROLLER_METADATA_KEY} from "./decorators/controller";
+import {AUTOWIRED_METADA_KEY, AutowiredValueItem} from "./decorators";
 
 // 类型和名字 对象实例储存
 const typeMap = new Map<Constructor<any>, any>();
@@ -19,18 +20,20 @@ const nameMap = new Map<string, any>();
 /**
  * 创建实例工场
  */
-export const BeanFactory = <T>(target: Constructor<T>): T => {
+export const BeanFactory = <T>(constructor: Constructor<T>): T => {
     // 从类型中获得
-    if (typeMap.has(target)) {
-        return typeMap.get(target);
+    if (typeMap.has(constructor)) {
+        return typeMap.get(constructor);
     }
     // 获取所有注入的服务
     let metadataValue: ServiceValue;
 
-    metadataValue = Reflect.getMetadata(CONTROLLER_METADATA_KEY, target);
+    metadataValue = Reflect.getMetadata(CONTROLLER_METADATA_KEY, constructor);
     if (!metadataValue) {
-        metadataValue = Reflect.getMetadata(SERVICE_METADATA_KEY, target);
+        metadataValue = Reflect.getMetadata(SERVICE_METADATA_KEY, constructor);
     }
+
+    assertTrue(!!metadataValue, 'bean不能被注入');
     // 从名字中获得
     if (nameMap.has(metadataValue.name)) {
         return nameMap.get(metadataValue.name);
@@ -38,9 +41,13 @@ export const BeanFactory = <T>(target: Constructor<T>): T => {
     // 得到构造参数 来手动构造实例
     const args = (metadataValue.providers && metadataValue.providers.length) ?
         metadataValue.providers.map(provider => BeanFactory(provider)) : [];
-    const result = new target(...args);
+    const result = new constructor(...args);
+    const autowiredValue: AutowiredValueItem[] = Reflect.getMetadata(AUTOWIRED_METADA_KEY, constructor.prototype);
+    if (autowiredValue) {
+        autowiredValue.forEach(item => result[item.propertyKey] = BeanFactory(item.type));
+    }
     // 放入 类型/名字
-    typeMap.set(target, result);
+    typeMap.set(constructor, result);
     nameMap.set(metadataValue.name, result);
     return result;
 };
@@ -61,6 +68,9 @@ function mapRoute<T>(constructor: Constructor<T>): Router[] {
         .map(key => {
             const requestMappingValue: RequestMappingValue =
                 Reflect.getMetadata(REQUEST_MAPPING_METADATA_KEY, constructor.prototype, <string> key);
+            if (!requestMappingValue) {
+                return null;
+            }
             const childPath = rootRequestMappingValue.path.map(root =>
                 requestMappingValue.path.map(child => root + child))
                 .reduce((v1, v2) => v1.concat(v2), []);
@@ -73,7 +83,7 @@ function mapRoute<T>(constructor: Constructor<T>): Router[] {
                 [...new Set([...rootRequestMappingValue.headers, ...requestMappingValue.headers])],
                 [...new Set([...rootRequestMappingValue.params, ...requestMappingValue.params])],
                 [...new Set([...rootRequestMappingValue.produces, ...requestMappingValue.produces])])
-        });
+        }).filter(item => item);
 }
 
 /**
@@ -99,6 +109,10 @@ function resolveMethodArgs(methodName, req, res, target) {
     const requestParamItems: RequestParamValueItem[] = Reflect.getMetadata(REQUEST_PARAM_METADATA_KEY, target, methodName) || [];
     const requestBodyItems: RequestBodyValueItem[] = Reflect.getMetadata(REQUEST_BODY_METADATA_KEY, target, methodName) || [];
     const paramTypes: Constructor[] = Reflect.getMetadata('design:paramtypes', target, methodName);
+    console.log(paramTypes);
+    console.log(paramTypes);
+    console.log(paramTypes);
+    console.log(paramTypes);
     return paramTypes.map((paramType, index) =>
         getMethodArgValue(paramType, index, res, req, {pathVariableItems, requestParamItems, requestBodyItems}));
 }
@@ -162,10 +176,7 @@ function getRequestParamArgValue(req, requestParamItem: RequestParamValueItem, p
 
 function getRequestBodyArgValue(req, requestBodyItem: RequestBodyValueItem, paramType) {
     const body = req.body;
-
-    console.log(`${Object.keys(req)}................`);
     assertFalse(requestBodyItem.required && !body, `body不能为空`, BadRequestError);
-    console.log(typeof paramType);
     return body;
 }
 

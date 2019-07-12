@@ -1,4 +1,4 @@
-import {parameterDecoratorFactory} from "../utils/decorator-util";
+import {parameterDecoratorFactoryBuilder, parameterDecoratorFactoryBuilderOptionsEmptiable} from "../utils/decorator-util";
 import {SingleParameterParam} from "./common/single-parameter";
 
 
@@ -9,7 +9,7 @@ export type RequestBodyValueItem = {
     parameterIndex: number;
 }
 
-export const RequestBody = parameterDecoratorFactory<SingleParameterParam<'required', boolean>, RequestBodyValueItem>(
+export const RequestBody = parameterDecoratorFactoryBuilderOptionsEmptiable<SingleParameterParam<'required', boolean>, RequestBodyValueItem>(
     REQUEST_BODY_METADATA_KEY, (param, target, propertyKey, parameterIndex) => {
         const value = {
             required: false,
