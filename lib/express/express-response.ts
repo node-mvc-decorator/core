@@ -1,4 +1,4 @@
-import {Response} from "../beans/common/response";
+import {Response} from "../beans/response";
 
 export class ExpressResponse extends Response {
 

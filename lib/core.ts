@@ -1,18 +1,15 @@
-import {Constructor} from "./beans/common/constructor";
+import {Constructor} from "./beans/constructor";
 import {assertFalse, isConstructor, isFunction, stringValueToObjValue} from "./utils/common-util";
-import {Response} from "./beans/common/response";
-import {Request} from "./beans/common/request";
+import {Response} from "./beans/response";
+import {Request} from "./beans/request";
 import {BadRequestError} from "./errors/bad-request-error";
-import {PathVariableMetadataValueItem} from "./beans/metadata-value/path-variable-metadata-value-item";
-import {RequestParamMetadataValueItem} from "./beans/metadata-value/request-param-metadata-value-item";
-import {RequestBodyMetadataValueItem} from "./beans/metadata-value/request-body-metadata-value-item";
 import {REQUEST_MAPPING_METADATA_KEY, RequestMappingValue} from "./decorators/request-mapping";
 import * as path from 'path'
 import {SERVICE_METADATA_KEY, ServiceValue} from "./decorators/service";
 import {PATH_VARIABLE_METADATA_KEY, PathVariableValueItem} from "./decorators/path-variable";
 import {REQUEST_PARAM_METADATA_KEY, RequestParamValueItem} from "./decorators/request-param";
 import {REQUEST_BODY_METADATA_KEY, RequestBodyValueItem} from "./decorators/request-body";
-import {Router} from "./beans/common/router";
+import {Router} from "./beans/router";
 import {CONTROLLER_METADATA_KEY} from "./decorators/controller";
 
 // 类型和名字 对象实例储存
@@ -154,7 +151,7 @@ function getMethodArgValue(paramType, index, res, req, {pathVariableItems, reque
  * @param paramType
  * @return {any}
  */
-function getRequestParamArgValue(req, requestParamItem: RequestParamMetadataValueItem, paramType) {
+function getRequestParamArgValue(req, requestParamItem: RequestParamValueItem, paramType) {
     const value = req.query[requestParamItem.name];
     assertFalse(requestParamItem.required && !value, `${requestParamItem.name}不能为空`, BadRequestError);
     if (!value) {
@@ -163,7 +160,7 @@ function getRequestParamArgValue(req, requestParamItem: RequestParamMetadataValu
     return stringValueToObjValue(value, paramType);
 }
 
-function getRequestBodyArgValue(req, requestBodyItem: RequestBodyMetadataValueItem, paramType) {
+function getRequestBodyArgValue(req, requestBodyItem: RequestBodyValueItem, paramType) {
     const body = req.body;
 
     console.log(`${Object.keys(req)}................`);
@@ -179,7 +176,7 @@ function getRequestBodyArgValue(req, requestBodyItem: RequestBodyMetadataValueIt
  * @param paramType
  * @return {any}
  */
-function getPathVariableArgValue(req, pathVariableItem: PathVariableMetadataValueItem, paramType) {
+function getPathVariableArgValue(req, pathVariableItem: PathVariableValueItem, paramType) {
     const value = req.params[pathVariableItem.name];
     assertFalse(pathVariableItem.required && !value, `${pathVariableItem.name}不能为空`, BadRequestError);
     if (!value) {

@@ -1,7 +1,7 @@
 import {classDecoratorFactoryBuilder} from "../utils/decorator-util";
 import {SingleParameterMetadataValue, SingleParameterParam} from "./common/single-parameter";
 import {getBeanName} from "../utils/common-util";
-import {Constructor} from "../beans/common/constructor";
+import {Constructor} from "../beans/constructor";
 
 export const SERVICE_METADATA_KEY = Symbol('Service');
 export const serviceMetadataValueConverter = (param, target) => {

@@ -1,7 +1,5 @@
-import {parameterDecoratorFactory, saveMetadataValueItem} from "../utils/decorator-util";
-import {REQUEST_BODY_METADATA} from "../constants/metadata-key";
-import {RequestBodyMetadataValueItem} from "../beans/metadata-value/request-body-metadata-value-item";
-import {SingleParameterMetadataValue, SingleParameterParam} from "./common/single-parameter";
+import {parameterDecoratorFactory} from "../utils/decorator-util";
+import {SingleParameterParam} from "./common/single-parameter";
 
 
 export const REQUEST_BODY_METADATA_KEY = Symbol('RequestBody');

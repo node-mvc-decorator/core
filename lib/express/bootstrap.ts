@@ -1,5 +1,5 @@
-import {resolveRoute} from "../core2";
-import {Constructor} from "../beans/common/constructor";
+import {resolveRoute} from "../core";
+import {Constructor} from "../beans/constructor";
 import * as express from "express";
 
 export function bootstrap(...constructors: Array<Constructor>) {

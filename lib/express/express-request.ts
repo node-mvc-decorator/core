@@ -1,4 +1,4 @@
-import {Request} from "../beans/common/request";
+import {Request} from "../beans/request";
 
 export class ExpressRequest extends Request {
 

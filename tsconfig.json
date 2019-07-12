@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
+    "outDir": "./",
     "module": "commonjs",
     "target": "es6",
+    "declaration": true,
     "lib": [
       "es6",
       "dom"
@@ -11,11 +13,7 @@
     "sourceMap": true
   },
   "exclude": [
-    "node_modules"
-  ],
-  "paths": {
-    "@node-mvc/core": [
-      "dist"
-    ]
-  }
+    "node_modules",
+    "dist"
+  ]
 }

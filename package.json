@@ -1,13 +1,11 @@
 {
-  "name": "@node-mvc/core",
-  "version": "0.0.0",
+  "name": "@node-mvc-decorator/core",
+  "version": "0.0.7",
   "license": "MIT",
+  "main": "index.js",
   "scripts": {
-    "npm:scope:node-mvc": "npm config set scope node-mvc",
-    "@node-mvc/core:build": "tsc -p . && npm link .",
-    "@node-mvc/core:publish": "npm run @node-mvc/core:build && npm run npm:scope:node-mvc && npm publish --access public dist/ngx-electron/main"
+    "build:publish": "tsc && npm config set scope node-mvc-decorator && npm publish --access public"
   },
-  "private": true,
   "dependencies": {
     "@types/node": "^12.6.2",
     "express": "^4.17.1",
@@ -17,5 +15,17 @@
     "ts-node": "~4.1.0",
     "tslint": "~5.9.1",
     "typescript": "~2.5.3"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/node-mvc/core.git"
+  },
+  "keywords": [
+    "typescript"
+  ],
+  "author": "wangliang",
+  "bugs": {
+    "url": "https://github.com/node-mvc/core/issues"
+  },
+  "homepage": "https://github.com/node-mvc/core#readme"
 }

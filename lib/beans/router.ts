@@ -1,6 +1,6 @@
 import {Constructor} from "./constructor";
-import {RequestMethod} from "../../enums/request-method";
-import {errorHandler, requestHandler} from "../../core2";
+import {RequestMethod} from "../enums/request-method";
+import {errorHandler, requestHandler} from "../core";
 
 export class Router {
 
@@ -12,7 +12,7 @@ export class Router {
                 public headers: string[],
                 public params: string[],
                 public produces: string[]) {}
-    handler(req, res) {
+    handler(req: any, res: any) {
         try {
             requestHandler(this, req, res);
         } catch (e) {
