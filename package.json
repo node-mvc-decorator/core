@@ -1,0 +1,21 @@
+{
+  "name": "@node-mvc/core",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "npm:scope:node-mvc": "npm config set scope node-mvc",
+    "@node-mvc/core:build": "tsc -p . && npm link .",
+    "@node-mvc/core:publish": "npm run @node-mvc/core:build && npm run npm:scope:node-mvc && npm publish --access public dist/ngx-electron/main"
+  },
+  "private": true,
+  "dependencies": {
+    "@types/node": "^12.6.2",
+    "express": "^4.17.1",
+    "reflect-metadata": "^0.1.13"
+  },
+  "devDependencies": {
+    "ts-node": "~4.1.0",
+    "tslint": "~5.9.1",
+    "typescript": "~2.5.3"
+  }
+}
