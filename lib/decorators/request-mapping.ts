@@ -1,4 +1,4 @@
-import {RequestMethod} from "../enums/request-method";
+import {RequestMethod} from "../http/request-method";
 import {methodAndClassDecoratorFactoryBuilderOptionsEmptiable} from "../utils/decorator-util";
 import {getArrayValue} from "../utils/common-util";
 
@@ -37,7 +37,6 @@ export const defaultValue = {
 };
 
 const metadataValueConverter = (param) => {
-    console.log(param);
     if (param) {
         if (typeof param === 'string') {
             return {
@@ -84,7 +83,7 @@ export const methodMappingFactory = (method: RequestMethod): MethodDecorator & (
         // 没有option时
         if (args.length === 3) {
             return RequestMapping({
-                path: '',
+                path: [''],
                 method: method
             })(args[0], args[1], args[2]);
         } else if (args.length === 1) {

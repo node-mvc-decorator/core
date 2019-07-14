@@ -9,6 +9,8 @@ export abstract class HttpResponse<T = any>  {
     abstract status(code: number): this;
 
     abstract send(body: any): this;
+
+    abstract type(type: string): this;
 }
 
 

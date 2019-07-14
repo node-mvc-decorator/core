@@ -7,12 +7,15 @@ import {ExpressResponse} from './lib/express/express-response';
 @Controller
 export class A {
 
-    @GetMapping('/')
-    testGet(res: ExpressResponse) {
+    @GetMapping
+    testGet(req: ExpressRequest) {
+        console.log(req.request.headers);
         console.log(123231123);
+
         return 'asdfadsf';
     }
-    @GetMapping('/')
+
+    @GetMapping({path: '/', params: 'b'})
     testGet2(res: ExpressResponse) {
         console.log(222222222);
         return 'aaaa';

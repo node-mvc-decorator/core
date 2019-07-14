@@ -1,18 +1,21 @@
 import {Constructor} from "./beans/constructor";
 import {assertFalse, assertTrue, isConstructor, isFunction, stringValueToObjValue} from "./utils/common-util";
-import {BadRequestError} from "./errors/bad-request-error";
+import {BadRequestError} from "./http/errors/bad-request-error";
 import {defaultValue, REQUEST_MAPPING_METADATA_KEY, RequestMappingValue} from './decorators/request-mapping';
 import * as path from 'path'
 import {SERVICE_METADATA_KEY, ServiceValue} from "./decorators/service";
 import {PATH_VARIABLE_METADATA_KEY, PathVariableValueItem} from "./decorators/path-variable";
 import {REQUEST_PARAM_METADATA_KEY, RequestParamValueItem} from "./decorators/request-param";
 import {REQUEST_BODY_METADATA_KEY, RequestBodyValueItem} from "./decorators/request-body";
-import {Router} from "./beans/router";
+import {Condition, Router} from './beans/router';
 import {CONTROLLER_METADATA_KEY} from "./decorators/controller";
 import {AUTOWIRED_METADA_KEY, AutowiredValueItem} from "./decorators";
-import {RequestMethod} from './enums/request-method';
-import {HttpRequest} from './beans/http-request';
-import {HttpResponse} from './beans/http-response';
+import {RequestMethod} from './http/request-method';
+import {HttpRequest} from './http/http-request';
+import {HttpResponse} from './http/http-response';
+import {InternalServiceError} from './http/errors/internal-service-error';
+import {UnsupportedMediaTypeError} from './http/errors/unsupported-media-type-error';
+import {NotAcceptableError} from './http/errors/not-acceptable-error';
 
 // 类型和名字 对象实例储存
 const typeMap = new Map<Constructor<any>, any>();
@@ -34,7 +37,7 @@ export const BeanFactory = <T>(constructor: Constructor<T>): T => {
         metadataValue = Reflect.getMetadata(SERVICE_METADATA_KEY, constructor);
     }
 
-    assertTrue(!!metadataValue, 'bean不能被注入');
+    assertTrue(!!metadataValue, InternalServiceError, 'bean不能被注入');
     // 从名字中获得
     if (nameMap.has(metadataValue.name)) {
         return nameMap.get(metadataValue.name);
@@ -53,6 +56,21 @@ export const BeanFactory = <T>(constructor: Constructor<T>): T => {
     return result;
 };
 
+function getPath(rootPath: string, childPath: string) {
+    const standardRootPath = getStandardPath(rootPath);
+    return (standardRootPath ? standardRootPath : '/') + getStandardPath(childPath);
+}
+
+function getStandardPath(path: string) {
+    while (path.endsWith('/')) {
+        path = path.slice(0, -2);
+    }
+    if (path && !path.startsWith('/')) {
+        path = `/${path}`;
+    }
+    return path;
+}
+
 /**
  * 解析路由
  * @param {Constructor<T>} constructor
@@ -64,9 +82,7 @@ function mapRoute<T>(constructor: Constructor<T>): Router[] {
 
     let rootRequestMappingValue: RequestMappingValue = Reflect.getMetadata(REQUEST_MAPPING_METADATA_KEY, constructor) || defaultValue;
 
-    const conditionsMap = new Map<string, Map<RequestMethod, object>>();
-
-    return Reflect.ownKeys(prototype)
+    const pathMap = Reflect.ownKeys(prototype)
         .filter(key => !isConstructor(key) && isFunction(prototype[key]) && typeof key === 'string')
         .map(key => {
             const requestMappingValue: RequestMappingValue =
@@ -74,11 +90,8 @@ function mapRoute<T>(constructor: Constructor<T>): Router[] {
             if (!requestMappingValue) {
                 return [];
             }
-
-
-
             const path = rootRequestMappingValue.path.map(root =>
-                requestMappingValue.path.map(child => root + child))
+                requestMappingValue.path.map(child => getPath(root, child)))
                 .reduce((v1, v2) => v1.concat(v2), []);
             const method = rootRequestMappingValue.method.filter(root => requestMappingValue.method.includes(root));
 
@@ -98,29 +111,106 @@ function mapRoute<T>(constructor: Constructor<T>): Router[] {
                 headers,
                 params,
                 produces,
-                type: constructor,
                 methodName: <string> key
             }))).reduce((v1, v2) => v1.concat(v2), []);
-        }).reduce((v1, v2) => {
-
-            return v1.concat(v2);
-        }, [])
+        }).reduce((v1, v2) => v1.concat(v2)).reduce((pathMap, item) => {
+            const condition = {
+                consumes:item.consumes,
+                headers: item.headers,
+                params: item.params,
+                produces: item.produces,
+                type: constructor,
+                methodName: item.methodName
+            };
+            let methodMap;
+            if (pathMap.has(item.path)) {
+                methodMap = pathMap.get(item.path);
+                if (methodMap.has(item.method)) {
+                    const conditions = methodMap.get(item.method);
+                    conditions.push(condition);
+                    return pathMap;
+                }
+            } else {
+                methodMap = new Map<RequestMethod, Condition[]>();
+                pathMap.set(item.path, methodMap)
+            }
+            methodMap.set(item.method, [condition]);
+            return pathMap;
+        }, new Map<string, Map<RequestMethod, Condition[]>>());
+    return [...pathMap].reduce((v1, v2) => {
+        [...v2[1]].forEach(item => {
+            v1.push({
+                path: v2[0],
+                method: item[0],
+                conditions: item[1]
+            });
+        });
+        return v1;
+    }, []);
 }
 
 /**
  * 请求处理方法
- * @param router 请求的路由信息
+ * @param conditions
  * @param req 请求
  * @param res 响应
  */
-export function requestHandler(router: Router, req: HttpRequest, res: HttpResponse) {
-    const target = BeanFactory(router.type);
-    const args = resolveMethodArgs(router.methodName, req, res, target);
-    const result = target[router.methodName](...args);
+export function requestHandler(conditions: Condition[], req: HttpRequest, res: HttpResponse) {
+    conditions = conditions.filter(condition => complexVerificationCondition(req.query, condition.params));
+    assertTrue(!!conditions.length, BadRequestError);
+
+    conditions = conditions.filter(condition => complexVerificationCondition(req.headers, condition.headers));
+    assertTrue(!!conditions.length, BadRequestError);
+
+    conditions = conditions.filter(condition => verificationContentType(req.headers['content-type'], condition.consumes));
+
+    assertTrue(!!conditions.length, UnsupportedMediaTypeError);
+    conditions = conditions.filter(condition => verificationContentType(req.headers['accept'], condition.produces));
+    assertTrue(!!conditions.length, NotAcceptableError);
+
+
+    assertTrue(conditions.length === 1, InternalServiceError);
+
+    const type = req.headers['accept'] || conditions[0].produces[0];
+    if (type) {
+        res.type(type);
+    }
+    const target = BeanFactory(conditions[0].type);
+    const args = resolveMethodArgs(conditions[0].methodName, req, res, target);
+    const result = target[conditions[0].methodName](...args);
     if (result) {
         res.send(result);
     }
 }
+
+/**
+ * 简单校验 判断data是否在conditionValues中
+ * @param data
+ * @param conditionValues
+ */
+function verificationContentType(data: any, conditionValues: string[]) {
+    return !data || !conditionValues.length || conditionValues.some(value => value.includes(data));
+}
+
+/**
+ * 复杂校验 三种情况 ['a', 'b=3', 'c!=4']
+ * @param data
+ * @param conditionValues
+ */
+function complexVerificationCondition(data: any, conditionValues: string[]) {
+    return !data || !conditionValues.length || conditionValues.every(conditionValue => {
+        if (conditionValue.includes('=')) {
+            let [key, value] = conditionValue.split('=', 1);
+            if (key.endsWith('!')) {
+                key = key.slice(0, -2);
+                return data[key] != value;
+            }
+            return data[key] == value;
+        }
+        return data[conditionValue] !== undefined;
+    });
+}
+
 
 /**
  * 解析出方法的所有参数
@@ -185,7 +275,7 @@ function getMethodArgValue(paramType, index, res: HttpResponse, req: HttpRequest
  */
 function getRequestParamArgValue(req: HttpRequest, requestParamItem: RequestParamValueItem, paramType) {
     const value = req.query[requestParamItem.name];
-    assertFalse(requestParamItem.required && !value, `${requestParamItem.name}不能为空`, BadRequestError);
+    assertFalse(requestParamItem.required && !value, BadRequestError, `${requestParamItem.name}不能为空`);
     if (!value) {
         return requestParamItem.defaultValue;
     }
@@ -194,7 +284,7 @@ function getRequestParamArgValue(req: HttpRequest, requestParamItem: RequestPara
 
 function getRequestBodyArgValue(req: HttpRequest, requestBodyItem: RequestBodyValueItem, paramType) {
     const body = req.body;
-    assertFalse(requestBodyItem.required && !body, `body不能为空`, BadRequestError);
+    assertFalse(requestBodyItem.required && !body, BadRequestError, `body不能为空`);
     return body;
 }
 
@@ -207,7 +297,7 @@ function getRequestBodyArgValue(req: HttpRequest, requestBodyItem: RequestBodyVa
  */
 function getPathVariableArgValue(req: HttpRequest, pathVariableItem: PathVariableValueItem, paramType) {
     const value = req.params[pathVariableItem.name];
-    assertFalse(pathVariableItem.required && !value, `${pathVariableItem.name}不能为空`, BadRequestError);
+    assertFalse(pathVariableItem.required && !value, BadRequestError, `${pathVariableItem.name}不能为空`);
     if (!value) {
         return null;
     }
@@ -229,7 +319,7 @@ export function resolveRouter(constructors: Constructor[], setRouter: (path: str
     constructors.map(mapRoute).reduce((a, b) => a.concat(b), []).forEach(router => {
         setRouter(router.path, router.method, (req, res) => {
             try {
-                requestHandler(router, req, res);
+                requestHandler(router.conditions, req, res);
             } catch (e) {
                 errorHandler(e, res);
             }

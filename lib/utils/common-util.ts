@@ -1,5 +1,6 @@
-import {InternalServiceError} from "../errors/internal-service-error";
-import {BadRequestError} from "../errors/bad-request-error";
+import {InternalServiceError} from "../http/errors/internal-service-error";
+import {BadRequestError} from "../http/errors/bad-request-error";
+import {HttpError} from '../http/errors/http-error';
 
 export function isConstructor(key: string | number | symbol) {
     return key === 'constructor';
@@ -10,14 +11,14 @@ export function isFunction(value: any) {
 }
 
 
-export function assertTrue(condition: boolean, message: string, type = InternalServiceError) {
+export function assertTrue(condition: boolean, type = InternalServiceError, message?: string) {
     if (!condition) {
         throw new type(message);
     }
 }
 
-export function assertFalse(condition: boolean, message: string, type = InternalServiceError) {
-    assertTrue(!condition, message, type);
+export function assertFalse(condition: boolean, type = InternalServiceError, message?: string) {
+    assertTrue(!condition, type, message);
 }
 
 export function getBeanName(fun: Function) {
@@ -34,12 +35,12 @@ export function stringValueToObjValue(value: string, type) {
     switch (type) {
         case Number:
             const numValue = Number(value);
-            assertFalse(isNaN(numValue), 'String转Number类型转换异常', BadRequestError);
+            assertFalse(isNaN(numValue), BadRequestError, 'String转Number类型转换异常');
             return numValue;
         case String:
             return value;
         case Boolean:
-            assertTrue(value === 'true' || value === 'false', 'String转Boolean类型转换异常', BadRequestError);
+            assertTrue(value === 'true' || value === 'false', BadRequestError, 'String转Boolean类型转换异常');
             return value === 'true';
         default:
             throw new BadRequestError('没有指定类型的数据');

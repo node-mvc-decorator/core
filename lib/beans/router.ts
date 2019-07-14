@@ -1,8 +1,8 @@
 import {Constructor} from "./constructor";
-import {RequestMethod} from "../enums/request-method";
+import {RequestMethod} from "../http/request-method";
 import {errorHandler, requestHandler} from "../core";
-import {HttpRequest} from './http-request';
-import {HttpResponse} from './http-response';
+import {HttpRequest} from '../http/http-request';
+import {HttpResponse} from '../http/http-response';
 
 // export class Router {
 //
@@ -26,6 +26,10 @@ import {HttpResponse} from './http-response';
 export interface Router {
     path: string;
     method: RequestMethod;
+    conditions: Condition[];
+}
+
+export interface Condition {
     consumes: string[];
     headers: string[];
     params: string[];
