@@ -1,21 +1,21 @@
 import {Constructor} from "./beans/constructor";
 import {assertFalse, assertTrue, isConstructor, isFunction, stringValueToObjValue} from "./utils/common-util";
-import {BadRequestError} from "./http/errors/bad-request-error";
-import {defaultValue, REQUEST_MAPPING_METADATA_KEY, RequestMappingValue} from './decorators/request-mapping';
+import {BadRequestError} from './http';
+import {defaultValue, REQUEST_MAPPING_METADATA_KEY, RequestMappingValue} from './decorators';
 import * as path from 'path'
-import {SERVICE_METADATA_KEY, ServiceValue} from "./decorators/service";
+import {SERVICE_METADATA_KEY, ServiceValue} from './decorators';
 import {PATH_VARIABLE_METADATA_KEY, PathVariableValueItem} from "./decorators/path-variable";
-import {REQUEST_PARAM_METADATA_KEY, RequestParamValueItem} from "./decorators/request-param";
-import {REQUEST_BODY_METADATA_KEY, RequestBodyValueItem} from "./decorators/request-body";
+import {REQUEST_PARAM_METADATA_KEY, RequestParamValueItem} from './decorators';
+import {REQUEST_BODY_METADATA_KEY, RequestBodyValueItem} from './decorators';
 import {Condition, Router} from './beans/router';
-import {CONTROLLER_METADATA_KEY} from "./decorators/controller";
+import {CONTROLLER_METADATA_KEY} from './decorators';
 import {AUTOWIRED_METADA_KEY, AutowiredValueItem} from "./decorators";
-import {RequestMethod} from './http/request-method';
-import {HttpRequest} from './http/http-request';
-import {HttpResponse} from './http/http-response';
-import {InternalServiceError} from './http/errors/internal-service-error';
-import {UnsupportedMediaTypeError} from './http/errors/unsupported-media-type-error';
-import {NotAcceptableError} from './http/errors/not-acceptable-error';
+import {RequestMethod} from './http';
+import {HttpRequest} from './http';
+import {HttpResponse} from './http';
+import {InternalServiceError} from './http';
+import {UnsupportedMediaTypeError} from './http';
+import {NotAcceptableError} from './http';
 
 // 类型和名字 对象实例储存
 const typeMap = new Map<Constructor<any>, any>();
@@ -24,7 +24,7 @@ const nameMap = new Map<string, any>();
 /**
  * 创建实例工场
  */
-export const BeanFactory = <T>(constructor: Constructor<T>): T => {
+const BeanFactory = <T>(constructor: Constructor<T>): T => {
     // 从类型中获得
     if (typeMap.has(constructor)) {
         return typeMap.get(constructor);
@@ -155,7 +155,7 @@ function mapRoute<T>(constructor: Constructor<T>): Router[] {
  * @param req 请求
  * @param res 响应
  */
-export function requestHandler(conditions: Condition[], req: HttpRequest, res: HttpResponse) {
+function requestHandler(conditions: Condition[], req: HttpRequest, res: HttpResponse) {
     conditions = conditions.filter(condition => complexVerificationCondition(req.query, condition.params));
     assertTrue(!!conditions.length, BadRequestError);
 
@@ -305,17 +305,13 @@ function getPathVariableArgValue(req: HttpRequest, pathVariableItem: PathVariabl
 }
 
 
-export function errorHandler(error, res: HttpResponse) {
+function errorHandler(error, res: HttpResponse) {
     console.error(error);
     res.status(error.status).send(error.message);
 }
 
 
-export function resolveRoute(constructors: Constructor[]) {
-    return constructors.map(mapRoute).reduce((a, b) => a.concat(b), []);
-}
-
-export function resolveRouter(constructors: Constructor[], setRouter: (path: string, method: RequestMethod, handleRequest: (req: HttpRequest, res: HttpResponse) => void) => void) {
+function resolveRouter(constructors: Constructor[], setRouter: (path: string, method: RequestMethod, handleRequest: (req: HttpRequest, res: HttpResponse) => void) => void) {
     constructors.map(mapRoute).reduce((a, b) => a.concat(b), []).forEach(router => {
         setRouter(router.path, router.method, (req, res) => {
             try {
@@ -326,3 +322,5 @@ export function resolveRouter(constructors: Constructor[], setRouter: (path: str
         });
     });
 }
+
+export {resolveRouter};

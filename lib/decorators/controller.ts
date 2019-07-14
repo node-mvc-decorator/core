@@ -2,11 +2,13 @@ import {classDecoratorFactoryBuilderOptionsEmptiable} from "../utils/decorator-u
 import {SingleParameterMetadataValue, SingleParameterParam} from "./common/single-parameter";
 import {serviceMetadataValueConverter} from "./service";
 
-export const CONTROLLER_METADATA_KEY = Symbol('CONTROLLER_METADATA_KEY');
+const CONTROLLER_METADATA_KEY = Symbol('CONTROLLER_METADATA_KEY');
 
 
-export const Controller = classDecoratorFactoryBuilderOptionsEmptiable<
+const Controller = classDecoratorFactoryBuilderOptionsEmptiable<
     SingleParameterParam<'name', string>, SingleParameterMetadataValue<'name', string>>(
     CONTROLLER_METADATA_KEY, serviceMetadataValueConverter);
 
 
+
+export {CONTROLLER_METADATA_KEY, Controller};

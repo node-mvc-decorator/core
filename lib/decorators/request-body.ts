@@ -2,14 +2,14 @@ import {parameterDecoratorFactoryBuilder, parameterDecoratorFactoryBuilderOption
 import {SingleParameterParam} from "./common/single-parameter";
 
 
-export const REQUEST_BODY_METADATA_KEY = Symbol('RequestBody');
+const REQUEST_BODY_METADATA_KEY = Symbol('RequestBody');
 
-export type RequestBodyValueItem = {
+type RequestBodyValueItem = {
     required: boolean;
     parameterIndex: number;
 }
 
-export const RequestBody = parameterDecoratorFactoryBuilderOptionsEmptiable<SingleParameterParam<'required', boolean>, RequestBodyValueItem>(
+const RequestBody = parameterDecoratorFactoryBuilderOptionsEmptiable<SingleParameterParam<'required', boolean>, RequestBodyValueItem>(
     REQUEST_BODY_METADATA_KEY, (param, target, propertyKey, parameterIndex) => {
         const value = {
             required: false,
@@ -31,4 +31,6 @@ export const RequestBody = parameterDecoratorFactoryBuilderOptionsEmptiable<Sing
         return value;
     }
 );
+
+export {REQUEST_BODY_METADATA_KEY, RequestBodyValueItem, RequestBody};
 

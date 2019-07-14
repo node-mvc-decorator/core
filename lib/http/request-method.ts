@@ -1,4 +1,4 @@
-export enum RequestMethod {
+enum RequestMethod {
     GET = 'get',
     HEAD = 'head',
     POST = 'post',
@@ -8,3 +8,5 @@ export enum RequestMethod {
     OPTIONS = 'options',
     TRACE = 'trace'
 }
+
+export {RequestMethod};

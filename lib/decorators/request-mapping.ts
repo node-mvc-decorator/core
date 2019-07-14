@@ -2,9 +2,9 @@ import {RequestMethod} from "../http/request-method";
 import {methodAndClassDecoratorFactoryBuilderOptionsEmptiable} from "../utils/decorator-util";
 import {getArrayValue} from "../utils/common-util";
 
-export const REQUEST_MAPPING_METADATA_KEY = Symbol('REQUEST_MAPPING_METADATA_KEY');
+const REQUEST_MAPPING_METADATA_KEY = Symbol('REQUEST_MAPPING_METADATA_KEY');
 
-export type RequestMappingParam = {
+type RequestMappingParam = {
     method: RequestMethod[] | RequestMethod;
     path: string[] | string;
     params?: string[] | string;
@@ -13,7 +13,7 @@ export type RequestMappingParam = {
     produces?: string[] | string;
 } | string;
 
-export interface RequestMappingValue {
+interface RequestMappingValue {
     path: string[];
     method: RequestMethod[];
     // ['a', '!b', 'c=4', 'b!=4']
@@ -27,7 +27,7 @@ export interface RequestMappingValue {
 
 const defaultMethod = [RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE];
 
-export const defaultValue = {
+const defaultValue = {
     method: defaultMethod,
     path: [''],
     params: [],
@@ -59,13 +59,13 @@ const metadataValueConverter = (param) => {
 };
 
 
-export const RequestMapping = methodAndClassDecoratorFactoryBuilderOptionsEmptiable<RequestMappingParam,
+const RequestMapping = methodAndClassDecoratorFactoryBuilderOptionsEmptiable<RequestMappingParam,
     RequestMappingValue, RequestMappingValue>(
     REQUEST_MAPPING_METADATA_KEY, metadataValueConverter, metadataValueConverter
 );
 
 
-export type MethodMappingParam = {
+type MethodMappingParam = {
     path: string[] | string;
     params?: string[] | string;
     headers?: string[] | string;
@@ -78,7 +78,7 @@ export type MethodMappingParam = {
  * 为 GetMapping ... 所使用
  * @param method
  */
-export const methodMappingFactory = (method: RequestMethod): MethodDecorator & ((option: MethodMappingParam) => MethodDecorator) =>
+const methodMappingFactory = (method: RequestMethod): MethodDecorator & ((option: MethodMappingParam) => MethodDecorator) =>
     (...args) => {
         // 没有option时
         if (args.length === 3) {
@@ -100,3 +100,5 @@ export const methodMappingFactory = (method: RequestMethod): MethodDecorator & (
             }
         }
     };
+
+export {REQUEST_MAPPING_METADATA_KEY, RequestMappingParam, RequestMappingValue, defaultMethod, defaultValue, metadataValueConverter, RequestMapping, MethodMappingParam, methodMappingFactory};

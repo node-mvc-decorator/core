@@ -1,8 +1,5 @@
-import {Constructor} from "./constructor";
-import {RequestMethod} from "../http/request-method";
-import {errorHandler, requestHandler} from "../core";
-import {HttpRequest} from '../http/http-request';
-import {HttpResponse} from '../http/http-response';
+import {Constructor} from './constructor';
+import {RequestMethod} from '../http/request-method';
 
 // export class Router {
 //
@@ -23,13 +20,8 @@ import {HttpResponse} from '../http/http-response';
 //         }
 //     }
 // }
-export interface Router {
-    path: string;
-    method: RequestMethod;
-    conditions: Condition[];
-}
 
-export interface Condition {
+interface Condition {
     consumes: string[];
     headers: string[];
     params: string[];
@@ -37,3 +29,11 @@ export interface Condition {
     type: Constructor;
     methodName: string;
 }
+interface Router {
+    path: string;
+    method: RequestMethod;
+    conditions: Condition[];
+}
+
+
+export {Condition, Router};

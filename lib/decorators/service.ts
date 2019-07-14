@@ -3,8 +3,8 @@ import {SingleParameterMetadataValue, SingleParameterParam} from "./common/singl
 import {getBeanName} from "../utils/common-util";
 import {Constructor} from "../beans/constructor";
 
-export const SERVICE_METADATA_KEY = Symbol('Service');
-export const serviceMetadataValueConverter = (param, target) => {
+const SERVICE_METADATA_KEY = Symbol('Service');
+const serviceMetadataValueConverter = (param, target) => {
     const providers: Constructor[] = Reflect.getMetadata('design:paramtypes', target);
     if (param) {
         if (typeof param === 'string') {
@@ -25,11 +25,13 @@ export const serviceMetadataValueConverter = (param, target) => {
     };
 };
 
-export type ServiceValue = {
+type ServiceValue = {
     name: string;
     providers: Constructor[];
 }
 
-export const Service = classDecoratorFactoryBuilderOptionsEmptiable<
+const Service = classDecoratorFactoryBuilderOptionsEmptiable<
     SingleParameterParam<'name', string>, ServiceValue>(
     SERVICE_METADATA_KEY, serviceMetadataValueConverter);
+
+export {SERVICE_METADATA_KEY, serviceMetadataValueConverter, ServiceValue, Service};

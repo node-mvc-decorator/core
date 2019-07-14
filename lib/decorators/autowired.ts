@@ -3,23 +3,25 @@ import {SingleParameterParam} from "./common/single-parameter";
 
 
 
-export const AUTOWIRED_METADA_KEY = Symbol('Autowired');
+const AUTOWIRED_METADA_KEY = Symbol('Autowired');
 
-export type AutowiredParam = {
+type AutowiredParam = {
     required?: boolean;
     type: any;
 }
 
-export type AutowiredValueItem = {
+type AutowiredValueItem = {
     required: boolean;
     type: any;
     propertyKey: string;
 }
 
-export const Autowired = propertyDecoratorFactoryBuilder<AutowiredParam, AutowiredValueItem>(
+const Autowired = propertyDecoratorFactoryBuilder<AutowiredParam, AutowiredValueItem>(
     AUTOWIRED_METADA_KEY, (option, target, propertyKey) => ({
         required: option.required,
         type: option.type,
         propertyKey
     })
 );
+
+export {AUTOWIRED_METADA_KEY, AutowiredParam, AutowiredValueItem, Autowired};
