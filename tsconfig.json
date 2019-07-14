@@ -6,7 +6,8 @@
     "declaration": true,
     "lib": [
       "es6",
-      "dom"
+      "dom",
+      "esnext"
     ],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

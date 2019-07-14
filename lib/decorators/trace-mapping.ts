@@ -1,4 +1,4 @@
-import {RequestMethod} from "../enums/request-method";
-import {methodMappingFactory, MethodMappingParam} from "./request-mapping";
+import {RequestMethod} from '../enums/request-method';
+import {methodMappingFactory} from './request-mapping';
 
-export const TraceMapping = (param: MethodMappingParam) => methodMappingFactory(RequestMethod.TRACE, param);
+export const TraceMapping = methodMappingFactory(RequestMethod.TRACE);

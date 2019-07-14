@@ -1,4 +1,4 @@
-import {RequestMethod} from "../enums/request-method";
-import {methodMappingFactory, MethodMappingParam} from "./request-mapping";
+import {RequestMethod} from '../enums/request-method';
+import {methodMappingFactory} from './request-mapping';
 
-export const HeadMapping = (param: MethodMappingParam) => methodMappingFactory(RequestMethod.HEAD, param);
+export const HeadMapping = methodMappingFactory(RequestMethod.HEAD);

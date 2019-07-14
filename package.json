@@ -1,20 +1,22 @@
 {
   "name": "@node-mvc-decorator/core",
-  "version": "0.0.9",
+  "version": "0.0.14",
   "license": "MIT",
   "main": "index.js",
   "scripts": {
+    "start": "tsc && ts-node demo.ts",
     "build:publish": "tsc && npm config set scope node-mvc-decorator && npm publish --access public"
   },
   "dependencies": {
     "@types/node": "^12.6.2",
-    "express": "^4.17.1",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
     "ts-node": "~4.1.0",
     "tslint": "~5.9.1",
-    "typescript": "~2.5.3"
+    "typescript": "~2.5.3",
+    "@types/express": "^4.17.0",
+    "express": "^4.17.1"
   },
   "repository": {
     "type": "git",

@@ -1,17 +1,15 @@
-import {resolveRoute} from "../core";
+import {resolveRoute, resolveRouter} from '../core';
 import {Constructor} from "../beans/constructor";
-import * as express from "express";
+import express = require("express");
+import {ExpressRequest} from './express-request';
+import {ExpressResponse} from './express-response';
 
-export function bootstrap(...constructors: Array<Constructor>) {
+export function bootstrap(...constructors: Array<Constructor>): express.Express {
     const app = express()
         .use(express.json())
         .use(express.urlencoded({ extended: true }));
-    resolveRoute(constructors).forEach(route => {
-        route.path.forEach(path => {
-            route.method.forEach(method => {
-                app[method](path, (req, res) => route.handler(req, res));
-            });
-        });
-    });
+
+    resolveRouter(constructors, (path, method, hanlder) =>
+        app[method](path, (req, res) => hanlder(new ExpressRequest(req), new ExpressResponse(res))));
     return app;
 }

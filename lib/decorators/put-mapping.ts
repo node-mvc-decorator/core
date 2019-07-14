@@ -1,4 +1,4 @@
-import {RequestMethod} from "../enums/request-method";
-import {methodMappingFactory, MethodMappingParam} from "./request-mapping";
+import {RequestMethod} from '../enums/request-method';
+import {methodMappingFactory} from './request-mapping';
 
-export const PutMapping = (param: MethodMappingParam) => methodMappingFactory(RequestMethod.PUT, param);
+export const PutMapping = methodMappingFactory(RequestMethod.PUT);

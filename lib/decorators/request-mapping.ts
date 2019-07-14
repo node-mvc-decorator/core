@@ -27,25 +27,26 @@ export interface RequestMappingValue {
 
 const defaultMethod = [RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE];
 
+export const defaultValue = {
+    method: defaultMethod,
+    path: [''],
+    params: [],
+    headers: [],
+    consumes: [],
+    produces: []
+};
+
 const metadataValueConverter = (param) => {
-    const value = {
-        method: defaultMethod,
-        path: [''],
-        params: [],
-        headers: [],
-        consumes: [],
-        produces: []
-    };
     console.log(param);
     if (param) {
         if (typeof param === 'string') {
             return {
-                ...value,
+                ...defaultValue,
                 path: [param]
             };
         } else {
             return {
-                ...value,
+                ...defaultValue,
                 method: getArrayValue(param.method, defaultMethod),//getArrayValue(param.method, ),
                 path: getArrayValue(param.path),
                 params: getArrayValue(param.params),
@@ -55,7 +56,7 @@ const metadataValueConverter = (param) => {
             };
         }
     }
-    return value;
+    return {...defaultValue};
 };
 
 
@@ -76,23 +77,27 @@ export type MethodMappingParam = {
 
 /**
  * 为 GetMapping ... 所使用
+ * @param method
  */
-export const methodMappingFactory = (method: RequestMethod, param: MethodMappingParam): MethodDecorator => {
-    if (param) {
-        if (typeof param === 'string') {
+export const methodMappingFactory = (method: RequestMethod): MethodDecorator & ((option: MethodMappingParam) => MethodDecorator) =>
+    (...args) => {
+        // 没有option时
+        if (args.length === 3) {
             return RequestMapping({
-                path: param,
-                method: RequestMethod.GET
-            });
-        } else {
-            return RequestMapping({
-                ...param,
-                method: RequestMethod.GET
-            });
+                path: '',
+                method: method
+            })(args[0], args[1], args[2]);
+        } else if (args.length === 1) {
+            if (typeof args[0] === 'string') {
+                return RequestMapping({
+                    path: args[0],
+                    method: method
+                });
+            } else {
+                return RequestMapping({
+                    ...args[0],
+                    method: method
+                });
+            }
         }
-    }
-    return RequestMapping({
-        path: '',
-        method: RequestMethod.GET
-    });
-};
+    };
