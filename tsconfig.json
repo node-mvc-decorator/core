@@ -10,8 +10,9 @@
       "esnext"
     ],
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "sourceMap": true
+    "emitDecoratorMetadata": true
+//  ,
+//    "sourceMap": true
   },
   "exclude": [
     "node_modules"
