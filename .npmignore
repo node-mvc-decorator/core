@@ -9,3 +9,4 @@ out
 gen
 demo
 package-lock.json
+**/*.ts
