@@ -1,5 +1,5 @@
 import {RequestMethod} from "../http/request-method";
-import {methodAndClassDecoratorFactoryBuilderOptionsEmptiable} from "../utils/decorator-util";
+import {methodAndClassDecoratorFactoryBuilderOptionsEmptiable} from "ts-decorators-utils";
 import {getArrayValue} from "../utils/common-util";
 
 const REQUEST_MAPPING_METADATA_KEY = Symbol('REQUEST_MAPPING_METADATA_KEY');

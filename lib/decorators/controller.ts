@@ -1,4 +1,4 @@
-import {classDecoratorFactoryBuilderOptionsEmptiable} from "../utils/decorator-util";
+import {classDecoratorFactoryBuilderOptionsEmptiable} from 'ts-decorators-utils';
 import {SingleParameterMetadataValue, SingleParameterParam} from "./common/single-parameter";
 import {serviceMetadataValueConverter} from "./service";
 

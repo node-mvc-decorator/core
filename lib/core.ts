@@ -2,7 +2,6 @@ import {Constructor} from "./beans/constructor";
 import {assertFalse, assertTrue, isConstructor, isFunction, stringValueToObjValue} from "./utils/common-util";
 import {BadRequestError} from './http';
 import {defaultValue, REQUEST_MAPPING_METADATA_KEY, RequestMappingValue} from './decorators';
-import * as path from 'path'
 import {SERVICE_METADATA_KEY, ServiceValue} from './decorators';
 import {PATH_VARIABLE_METADATA_KEY, PathVariableValueItem} from "./decorators/path-variable";
 import {REQUEST_PARAM_METADATA_KEY, RequestParamValueItem} from './decorators';
@@ -16,6 +15,7 @@ import {HttpResponse} from './http';
 import {InternalServiceError} from './http';
 import {UnsupportedMediaTypeError} from './http';
 import {NotAcceptableError} from './http';
+import 'reflect-metadata';
 
 // 类型和名字 对象实例储存
 const typeMap = new Map<Constructor<any>, any>();

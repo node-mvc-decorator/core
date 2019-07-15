@@ -1,7 +1,8 @@
-import {classDecoratorFactoryBuilder, classDecoratorFactoryBuilderOptionsEmptiable} from "../utils/decorator-util";
+import {classDecoratorFactoryBuilder, classDecoratorFactoryBuilderOptionsEmptiable} from "ts-decorators-utils";
 import {SingleParameterMetadataValue, SingleParameterParam} from "./common/single-parameter";
 import {getBeanName} from "../utils/common-util";
 import {Constructor} from "../beans/constructor";
+import 'reflect-metadata';
 
 const SERVICE_METADATA_KEY = Symbol('Service');
 const serviceMetadataValueConverter = (param, target) => {

@@ -1,7 +1,4 @@
-import {propertyDecoratorFactoryBuilder} from "../utils/decorator-util";
-import {SingleParameterParam} from "./common/single-parameter";
-
-
+import {propertyDecoratorFactoryBuilder} from 'ts-decorators-utils';
 
 const AUTOWIRED_METADA_KEY = Symbol('Autowired');
 

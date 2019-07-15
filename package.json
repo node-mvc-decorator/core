@@ -1,18 +1,20 @@
 {
   "name": "@node-mvc-decorator/core",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "license": "MIT",
   "main": "index.js",
   "scripts": {
     "build:publish": "tsc && npm config set scope node-mvc-decorator && npm publish --access public"
   },
   "dependencies": {
-    "@types/node": "^12.6.2",
-    "reflect-metadata": "^0.1.13"
+    "codelyzer": "^5.1.0",
+    "reflect-metadata": "^0.1.13",
+    "ts-decorators-utils": "~0.0.3"
   },
   "devDependencies": {
     "tslint": "~5.9.1",
-    "typescript": "~2.5.3"
+    "typescript": "~2.5.3",
+    "@types/node": "^12.6.2"
   },
   "repository": {
     "type": "git",
@@ -25,5 +27,5 @@
   "bugs": {
     "url": "https://github.com/node-mvc/core/issues"
   },
-  "homepage": "https://github.com/node-mvc/core#readme"
+  "homepage": "https://github.com/node-mvc-decorator/core#readme"
 }

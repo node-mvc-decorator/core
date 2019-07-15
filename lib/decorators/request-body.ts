@@ -1,4 +1,4 @@
-import {parameterDecoratorFactoryBuilder, parameterDecoratorFactoryBuilderOptionsEmptiable} from "../utils/decorator-util";
+import {parameterDecoratorFactoryBuilder, parameterDecoratorFactoryBuilderOptionsEmptiable} from "ts-decorators-utils";
 import {SingleParameterParam} from "./common/single-parameter";
 
 

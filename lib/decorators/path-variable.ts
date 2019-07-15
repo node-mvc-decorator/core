@@ -1,4 +1,4 @@
-import {parameterDecoratorFactoryBuilder} from "../utils/decorator-util";
+import {parameterDecoratorFactoryBuilder} from 'ts-decorators-utils';
 
 
 type PathVariableParam = {
