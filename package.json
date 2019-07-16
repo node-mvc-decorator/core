@@ -1,6 +1,6 @@
 {
   "name": "@node-mvc-decorator/core",
-  "version": "0.0.18",
+  "version": "0.0.20",
   "license": "MIT",
   "main": "index.js",
   "scripts": {
@@ -9,12 +9,11 @@
   "dependencies": {
     "codelyzer": "^5.1.0",
     "reflect-metadata": "^0.1.13",
-    "ts-decorators-utils": "~0.0.3"
+    "ts-decorators-utils": "~0.0.4"
   },
   "devDependencies": {
     "tslint": "~5.9.1",
-    "typescript": "~2.5.3",
-    "@types/node": "^12.6.2"
+    "typescript": "~2.5.3"
   },
   "repository": {
     "type": "git",
