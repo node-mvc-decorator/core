@@ -181,6 +181,7 @@ function requestHandler(conditions: Condition[], req: CoreRequest, res: CoreResp
     if (result) {
         res.send(result);
     }
+    res.end();
 }
 
 /**
@@ -198,12 +199,14 @@ function verificationContentType(data: any, conditionValues: string[]) {
  * @param conditionValues
  */
 function complexVerificationCondition(data: any, conditionValues: string[]) {
-    return !data || !conditionValues.length || conditionValues.every(conditionValue => {
+    return !conditionValues.length || conditionValues.every(conditionValue => {
+        if (!data) {
+            return false;
+        }
         if (conditionValue.includes('=')) {
-            let [key, value] = conditionValue.split('=', 1);
+            const [key, value] = conditionValue.split('=', 2);
             if (key.endsWith('!')) {
-                key = key.slice(0, -2);
-                return data[key] != value;
+                return data[key.slice(0, -2)] != value;
             }
             return data[key] == value;
         }
@@ -307,11 +310,11 @@ function getPathVariableArgValue(req: CoreRequest, pathVariableItem: PathVariabl
 
 function errorHandler(error, res: CoreResponse) {
     console.error(error);
-    res.status(error.status).send(error.message);
+    res.status(error.status).send(error.message).end();
 }
 
 
-function resolveRouter(constructors: Constructor[], setRouter: (path: string, method: RequestMethod, handleRequest: (req: CoreRequest, res: CoreResponse) => void) => void) {
+function resolveRouter(constructors: Constructor[], setRouter: (path: string, method: string, handleRequest: (req: CoreRequest, res: CoreResponse) => void) => void) {
     constructors.map(mapRoute).reduce((a, b) => a.concat(b), []).forEach(router => {
         setRouter(router.path, router.method, (req, res) => {
             try {
