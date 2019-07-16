@@ -1,5 +1,5 @@
 // this
-abstract class HttpResponse<T = any>  {
+abstract class CoreResponse<T = any>  {
     constructor(public response: T) {}
 
     /**
@@ -13,6 +13,6 @@ abstract class HttpResponse<T = any>  {
     abstract type(type: string): this;
 }
 
-export {HttpResponse};
+export {CoreResponse};
 
 

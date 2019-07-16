@@ -10,8 +10,8 @@ import {Condition, Router} from './beans/router';
 import {CONTROLLER_METADATA_KEY} from './decorators';
 import {AUTOWIRED_METADA_KEY, AutowiredValueItem} from "./decorators";
 import {RequestMethod} from './http';
-import {HttpRequest} from './http';
-import {HttpResponse} from './http';
+import {CoreRequest} from './http';
+import {CoreResponse} from './http';
 import {InternalServiceError} from './http';
 import {UnsupportedMediaTypeError} from './http';
 import {NotAcceptableError} from './http';
@@ -57,8 +57,8 @@ const BeanFactory = <T>(constructor: Constructor<T>): T => {
 };
 
 function getPath(rootPath: string, childPath: string) {
-    const standardRootPath = getStandardPath(rootPath);
-    return (standardRootPath ? standardRootPath : '/') + getStandardPath(childPath);
+    const path = getStandardPath(rootPath) + getStandardPath(childPath);
+    return path ? path : '/';
 }
 
 function getStandardPath(path: string) {
@@ -155,7 +155,7 @@ function mapRoute<T>(constructor: Constructor<T>): Router[] {
  * @param req 请求
  * @param res 响应
  */
-function requestHandler(conditions: Condition[], req: HttpRequest, res: HttpResponse) {
+function requestHandler(conditions: Condition[], req: CoreRequest, res: CoreResponse) {
     conditions = conditions.filter(condition => complexVerificationCondition(req.query, condition.params));
     assertTrue(!!conditions.length, BadRequestError);
 
@@ -215,7 +215,7 @@ function complexVerificationCondition(data: any, conditionValues: string[]) {
 /**
  * 解析出方法的所有参数
  */
-function resolveMethodArgs(methodName, req: HttpRequest, res: HttpResponse, target) {
+function resolveMethodArgs(methodName, req: CoreRequest, res: CoreResponse, target) {
     const pathVariableItems: PathVariableValueItem[] = Reflect.getMetadata(PATH_VARIABLE_METADATA_KEY, target, methodName) || [];
     const requestParamItems: RequestParamValueItem[] = Reflect.getMetadata(REQUEST_PARAM_METADATA_KEY, target, methodName) || [];
     const requestBodyItems: RequestBodyValueItem[] = Reflect.getMetadata(REQUEST_BODY_METADATA_KEY, target, methodName) || [];
@@ -235,12 +235,12 @@ function resolveMethodArgs(methodName, req: HttpRequest, res: HttpResponse, targ
  * @param requestBodyItems
  * @return {any}
  */
-function getMethodArgValue(paramType, index, res: HttpResponse, req: HttpRequest, {pathVariableItems, requestParamItems, requestBodyItems}) {
+function getMethodArgValue(paramType, index, res: CoreResponse, req: CoreRequest, {pathVariableItems, requestParamItems, requestBodyItems}) {
 
     // 判断是否为请求和响应类型参数
-    if (paramType.prototype instanceof HttpResponse) {
+    if (paramType.prototype instanceof CoreResponse) {
         return res;
-    } else if (paramType.prototype instanceof HttpRequest) {
+    } else if (paramType.prototype instanceof CoreRequest) {
         return req;
     }
 
@@ -273,7 +273,7 @@ function getMethodArgValue(paramType, index, res: HttpResponse, req: HttpRequest
  * @param paramType
  * @return {any}
  */
-function getRequestParamArgValue(req: HttpRequest, requestParamItem: RequestParamValueItem, paramType) {
+function getRequestParamArgValue(req: CoreRequest, requestParamItem: RequestParamValueItem, paramType) {
     const value = req.query[requestParamItem.name];
     assertFalse(requestParamItem.required && !value, BadRequestError, `${requestParamItem.name}不能为空`);
     if (!value) {
@@ -282,7 +282,7 @@ function getRequestParamArgValue(req: HttpRequest, requestParamItem: RequestPara
     return stringValueToObjValue(value, paramType);
 }
 
-function getRequestBodyArgValue(req: HttpRequest, requestBodyItem: RequestBodyValueItem, paramType) {
+function getRequestBodyArgValue(req: CoreRequest, requestBodyItem: RequestBodyValueItem, paramType) {
     const body = req.body;
     assertFalse(requestBodyItem.required && !body, BadRequestError, `body不能为空`);
     return body;
@@ -295,7 +295,7 @@ function getRequestBodyArgValue(req: HttpRequest, requestBodyItem: RequestBodyVa
  * @param paramType
  * @return {any}
  */
-function getPathVariableArgValue(req: HttpRequest, pathVariableItem: PathVariableValueItem, paramType) {
+function getPathVariableArgValue(req: CoreRequest, pathVariableItem: PathVariableValueItem, paramType) {
     const value = req.params[pathVariableItem.name];
     assertFalse(pathVariableItem.required && !value, BadRequestError, `${pathVariableItem.name}不能为空`);
     if (!value) {
@@ -305,13 +305,13 @@ function getPathVariableArgValue(req: HttpRequest, pathVariableItem: PathVariabl
 }
 
 
-function errorHandler(error, res: HttpResponse) {
+function errorHandler(error, res: CoreResponse) {
     console.error(error);
     res.status(error.status).send(error.message);
 }
 
 
-function resolveRouter(constructors: Constructor[], setRouter: (path: string, method: RequestMethod, handleRequest: (req: HttpRequest, res: HttpResponse) => void) => void) {
+function resolveRouter(constructors: Constructor[], setRouter: (path: string, method: RequestMethod, handleRequest: (req: CoreRequest, res: CoreResponse) => void) => void) {
     constructors.map(mapRoute).reduce((a, b) => a.concat(b), []).forEach(router => {
         setRouter(router.path, router.method, (req, res) => {
             try {

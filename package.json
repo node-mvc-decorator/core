@@ -1,6 +1,6 @@
 {
   "name": "@node-mvc-decorator/core",
-  "version": "0.0.20",
+  "version": "0.1.0",
   "license": "MIT",
   "main": "index.js",
   "scripts": {

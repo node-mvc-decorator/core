@@ -1,5 +1,13 @@
 # 提供一套类似 java spring mvc风格注解的 装饰器
 
+这个包是一个装饰器的一个接口 装饰器的实现  不包含服务器方法的实现
+
+比如 使用express做为node服务器 还需要引入[@node-mvc-decorator/express](https://www.npmjs.com/package/@node-mvc-decorator/express)
+
+使用原生http模块做为nodejs服务器 需要引入[@node-mvc-decorator/http](https://www.npmjs.com/package/@node-mvc-decorator/http)
+
+目前只实现了这俩种服务框架 如需要使用其他服务框架 下面以@node-mvc-decorator/express为例，有接入的详细步骤
+
 ## 安装
 
 ```bash
@@ -53,7 +61,7 @@ export class Controller {
 ```
 
 
-## 实现接口的上步聚 （需要三步）
+## 实现接口 的三步聚 以接入 express为例
 
 可以参照@node-mvc-decorator/express来实现
 
@@ -61,7 +69,7 @@ export class Controller {
 
 继承下面这个抽象类 实现其中的方法
 ```typescript
-export abstract class HttpRequest<T = any> {
+export abstract class CoreRequest<T = any> {
     constructor(public request: T) {}
     abstract get body(): any;
     abstract get query(): any;
@@ -74,7 +82,7 @@ export abstract class HttpRequest<T = any> {
 ```typescript
 import * as express from 'express';
 // 这里的request就是express.Request类型的数据 Express中的request 使用了@types/express来写类型
-export class ExpressRequest extends HttpRequest<express.Request> {
+export class ExpressRequest extends CoreRequest<express.Request> {
     get headers(): IncomingHttpHeaders {
         return this.request.headers;
     }
@@ -98,7 +106,7 @@ export class ExpressRequest extends HttpRequest<express.Request> {
 
 继承下面这个抽象类 实现其中的方法
 ```typescript
-export abstract class HttpResponse<T = any>  {
+export abstract class CoreResponse<T = any>  {
     constructor(public response: T) {}
     /**
      * 设置状态
@@ -116,7 +124,7 @@ export abstract class HttpResponse<T = any>  {
 ```typescript
 import * as express from 'express';
 
-export class ExpressResponse extends HttpResponse<express.Response> {
+export class ExpressResponse extends CoreResponse<express.Response> {
     send(body: any): this {
         this.response.send(body);
         return this;
@@ -134,6 +142,8 @@ export class ExpressResponse extends HttpResponse<express.Response> {
 
 ### 三、实现一个启动服务的方法 比如：
 
+使用resolveRouter方法来解析Controller 对接路由
+
 ```typescript
 import * as express from 'express';
 import {Constructor, resolveRouter} from '@node-mvc-decorator/core';
@@ -150,12 +160,16 @@ export function bootstrap(...constructors: Array<Constructor>): express.Express 
 ```
 
 上面的应用的例子是如何启动的呢
-使用
+使用(bootstrap(Controller)返回的就是Express对象 使用相应的方法监听)
 ```typescript
 // 多个controller就写多个这里只有一个 bootstrap只是解析出路由  返回的还是Express对象
 bootstrap(Controller).listen(3000, () => console.log('启动成功'));
 ```
 
-## 全用@node-mvc-decorator/express实现 的一个简单demo
+## 使用@node-mvc-decorator/express实现express 的一个简单demo
 
-@node-mvc-decorator/express-demo
+[@node-mvc-decorator/express-demo](https://github.com/node-mvc-decorator/express-demo)
+
+## 使用@node-mvc-decorator/http实现nodejs http原生模块 的一个简单demo
+
+[@node-mvc-decorator/http-demo](https://github.com/node-mvc-decorator/http-demo)

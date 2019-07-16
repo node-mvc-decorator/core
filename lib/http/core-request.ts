@@ -1,5 +1,5 @@
 
-export abstract class HttpRequest<T = any> {
+export abstract class CoreRequest<T = any> {
     constructor(public request: T) {}
 
     abstract get body(): any;
