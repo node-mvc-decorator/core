@@ -157,19 +157,20 @@ function mapRoute<T>(constructor: Constructor<T>): Router[] {
  */
 function requestHandler(conditions: Condition[], req: CoreRequest, res: CoreResponse) {
     conditions = conditions.filter(condition => complexVerificationCondition(req.query, condition.params));
-    assertTrue(!!conditions.length, BadRequestError);
+    assertTrue(!!conditions.length, BadRequestError, `参数不满足：${conditions.map(({params}) => params)}`);
 
     conditions = conditions.filter(condition => complexVerificationCondition(req.headers, condition.headers));
+    assertTrue(!!conditions.length, BadRequestError, `header不满足：${conditions.map(({headers}) => headers)}`);
     assertTrue(!!conditions.length, BadRequestError);
 
     conditions = conditions.filter(condition => verificationContentType(req.headers['content-type'], condition.consumes));
 
-    assertTrue(!!conditions.length, UnsupportedMediaTypeError);
+    assertTrue(!!conditions.length, UnsupportedMediaTypeError, `content-type不满足：${conditions.map(({consumes}) => consumes)}`);
     conditions = conditions.filter(condition => verificationContentType(req.headers['accept'], condition.produces));
-    assertTrue(!!conditions.length, NotAcceptableError);
+    assertTrue(!!conditions.length, NotAcceptableError, `accept不满足：${conditions.map(({produces}) => produces)}`);
 
 
-    assertTrue(conditions.length === 1, InternalServiceError);
+    assertTrue(conditions.length === 1, InternalServiceError, `多个路径匹配`);
 
     const type = req.headers['accept'] || conditions[0].produces[0];
     if (type) {
@@ -316,6 +317,7 @@ function errorHandler(error, res: CoreResponse) {
 
 function resolveRouter(constructors: Constructor[], setRouter: (path: string, method: string, handleRequest: (req: CoreRequest, res: CoreResponse) => void) => void) {
     constructors.map(mapRoute).reduce((a, b) => a.concat(b), []).forEach(router => {
+        console.log(JSON.stringify(router));
         setRouter(router.path, router.method, (req, res) => {
             try {
                 requestHandler(router.conditions, req, res);
