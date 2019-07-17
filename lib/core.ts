@@ -310,8 +310,7 @@ function getPathVariableArgValue(req: CoreRequest, pathVariableItem: PathVariabl
 
 
 function errorHandler(error, res: CoreResponse) {
-    console.error(error);
-    res.status(error.status).send(error.message).end();
+    res.sendStatus(error.status).send(error.message).end();
 }
 
 
